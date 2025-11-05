@@ -4,47 +4,68 @@ You,Charlie,4.0
 You,Diana,3.5
 You,Eric,3.0
 You,Frank,2.5
+
+# Alice's connections (including new girlfriend Sarah)
 Alice,Bob,3.0
 Alice,Charlie,2.5
 Alice,Sarah,5.0
 Alice,Tech_Influencer_1,1.5
 Alice,Fitness_Coach_1,2.0
+
+# Bob's connections (including new girlfriend Emma)
 Bob,Charlie,3.5
 Bob,Diana,2.0
 Bob,Emma,5.0
 Bob,Tech_Influencer_1,2.0
 Bob,Music_Artist_1,3.0
+
+# Charlie's connections
 Charlie,Diana,3.0
 Charlie,Eric,2.5
 Charlie,Sarah,1.0
 Charlie,Emma,1.5
 Charlie,Tech_Influencer_2,2.0
+
+# Diana's connections
 Diana,Eric,3.5
 Diana,Frank,2.0
 Diana,Fashion_Blogger_1,3.0
 Diana,Fashion_Blogger_2,2.5
+
+# Eric's connections
 Eric,Frank,3.0
 Eric,Gaming_Streamer_1,4.0
 Eric,Gaming_Streamer_2,3.5
 Eric,Tech_Influencer_2,2.0
+
+# Frank's connections
 Frank,Alice,1.5
 Frank,Music_Artist_1,3.5
 Frank,Music_Artist_2,3.0
+
+# Secondary connections (Sarah and Emma know each other)
 Sarah,Emma,3.0
 Sarah,Fashion_Blogger_1,2.0
 Sarah,Fitness_Coach_1,3.0
 Sarah,Lifestyle_Blogger_1,2.5
+
 Emma,Tech_Influencer_1,1.5
 Emma,Music_Artist_1,2.0
 Emma,Lifestyle_Blogger_1,3.0
+
+# Influencer network
 Tech_Influencer_1,Tech_Influencer_2,4.0
 Tech_Influencer_1,Gaming_Streamer_1,2.5
 Tech_Influencer_2,Gaming_Streamer_2,2.0
+
 Fashion_Blogger_1,Fashion_Blogger_2,4.5
 Fashion_Blogger_1,Lifestyle_Blogger_1,3.5
 Fashion_Blogger_2,Lifestyle_Blogger_1,3.0
+
 Music_Artist_1,Music_Artist_2,4.0
 Gaming_Streamer_1,Gaming_Streamer_2,4.5
+
+# Cross-community connections
 Fitness_Coach_1,Lifestyle_Blogger_1,3.0
 Tech_Influencer_1,Gaming_Streamer_2,2.0
 Fashion_Blogger_2,Music_Artist_2,1.5

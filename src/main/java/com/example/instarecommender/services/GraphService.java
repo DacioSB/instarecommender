@@ -1,10 +1,11 @@
-package com.example.instarecommender;
+package com.example.instarecommender.services;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jgrapht.Graph;
@@ -28,34 +29,27 @@ public class GraphService {
         graph.setEdgeWeight(graph.addEdge(from, to), weight);
     }
 
-    public void addUser(String user) {
-        graph.addVertex(user);
-    }
-
-    public List<String> recommend(String user) {
-        if (!graph.containsVertex(user)) return List.of();
-
-        var userFollowings = graph.outgoingEdgesOf(user).stream()
+    public Set<String> getFollowing(String user) {
+        return graph.outgoingEdgesOf(user).stream()
             .map(graph::getEdgeTarget)
             .collect(Collectors.toSet());
+    }
 
-        Map<String, Double> scores = new HashMap<>();
+    public Set<String> getFollowers(String user) {
+        return graph.incomingEdgesOf(user).stream()
+            .map(graph::getEdgeSource)
+            .collect(Collectors.toSet());
+    }
 
-        for (String friend : userFollowings) {
-            for (DefaultWeightedEdge edge : graph.outgoingEdgesOf(friend)) {
-                String suggestion = graph.getEdgeTarget(edge);
-                if (!suggestion.equals(user) && !userFollowings.contains(suggestion)) {
-                    scores.put(suggestion,
-                    scores.getOrDefault(suggestion, 0.0) + graph.getEdgeWeight(edge));
-                }
-            }
+    public void addUser(String user) {
+        if (!graph.containsVertex(user)) {
+            graph.addVertex(user);
         }
+    }
 
-
-        return scores.entrySet().stream()
-        .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-        .map(Map.Entry::getKey)
-        .toList();
+    public double getConnectionWeight(String from, String to) {
+        DefaultWeightedEdge edge = graph.getEdge(from, to);
+        return edge != null ? graph.getEdgeWeight(edge) : 0.0;
     }
 
     @PostConstruct

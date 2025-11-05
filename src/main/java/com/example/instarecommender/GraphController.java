@@ -11,19 +11,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.instarecommender.models.AlgorithmTypes;
+import com.example.instarecommender.services.GraphService;
+import com.example.instarecommender.services.RecommenderService;
+
 
 @RestController
 @RequestMapping("/api")
 public class GraphController {
     private final GraphService graphService;
+    private final RecommenderService recommenderService;
 
-    public GraphController(GraphService graphService) {
+    public GraphController(GraphService graphService, RecommenderService recommenderService) {
         this.graphService = graphService;
+        this.recommenderService = recommenderService;
     }
 
     @GetMapping("/recommend/{user}")
-    public Object recommend(@PathVariable String user) {
-        return graphService.recommend(user);
+    public Object recommend(@PathVariable String user, @RequestParam AlgorithmTypes algorithm, @RequestParam(defaultValue = "10") int limit) {
+        return recommenderService.recommend(user, algorithm, limit);
     }
 
     @GetMapping("/graph")
