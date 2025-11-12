@@ -1,4 +1,4 @@
-package com.example.instarecommender;
+package com.example.instarecommender.controllers;
 
 import java.util.Map;
 

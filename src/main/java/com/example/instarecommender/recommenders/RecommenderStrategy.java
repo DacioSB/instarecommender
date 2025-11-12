@@ -1,10 +1,8 @@
 package com.example.instarecommender.recommenders;
 
-import java.util.List;
-
-import com.example.instarecommender.models.Recommendation;
+import com.example.instarecommender.models.RecommendationResponse;
 
 public interface RecommenderStrategy {
-    List<Recommendation> recommend(String user, int limit);
+    RecommendationResponse recommend(String user, int limit);
     
 }

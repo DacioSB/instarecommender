@@ -1,24 +1,23 @@
 package com.example.instarecommender.services;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.example.instarecommender.models.AlgorithmTypes;
-import com.example.instarecommender.models.Recommendation;
+import com.example.instarecommender.models.RecommendationResponse;
 import com.example.instarecommender.recommenders.RecommenderFactory;
+import com.example.instarecommender.recommenders.RecommenderStrategy;
 
 @Service
 public class RecommenderService {
-    private final RecommenderFactory factory;
+    private final RecommenderFactory recommenderFactory;
 
-    public RecommenderService(RecommenderFactory factory) {
-        this.factory = factory;
+    public RecommenderService(RecommenderFactory recommenderFactory) {
+        this.recommenderFactory = recommenderFactory;
     }
 
-    public List<Recommendation> recommend (String user, AlgorithmTypes algorithm, int limit) {
-        
-        var recommender = factory.create(algorithm.getValue());
-        return recommender.recommend(user, limit);
+    public RecommendationResponse recommend(String user, AlgorithmTypes algorithm, int limit) {
+        RecommenderStrategy strategy = recommenderFactory.getRecommender(algorithm);
+        return strategy.recommend(user, limit);
     }
 }
+
