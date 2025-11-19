@@ -34,11 +34,7 @@ public class GraphController {
 
     @GetMapping("/graph")
     public Object fullGraph() {
-        return graphService.getGraph().edgeSet().stream().map(edge -> Map.of(
-            "from", graphService.getGraph().getEdgeSource(edge),
-            "to", graphService.getGraph().getEdgeTarget(edge),
-            "weight", graphService.getGraph().getEdgeWeight(edge)
-            )).toList();
+        return graphService.getGraph();
     }
 
 

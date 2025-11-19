@@ -38,6 +38,10 @@ public class GraphService {
         graphRepository.addUser(user);
     }
 
+    public GraphRepository getGraphRepository() {
+        return graphRepository;
+    }
+
     @PostConstruct
     public void loadGraphFromFile() {
         graphRepository.clear();

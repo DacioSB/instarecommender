@@ -26,10 +26,11 @@ public class RecommenderFactory {
         this.storageType = storageType;
 
         this.inMemoryStrategies = new EnumMap<>(AlgorithmTypes.class);
+        GraphRepository graphRepository = graphService.getGraphRepository();
         if (graphRepository instanceof InMemoryGraphRepository) {
             var repo = (InMemoryGraphRepository) graphRepository;
-            inMemoryStrategies.put(AlgorithmTypes.JACCARD, new JaccardRecommender(repo));
-            inMemoryStrategies.put(AlgorithmTypes.COMMON_NEIGHBORS, new CommonNeighborsRecommender(repo));
+            inMemoryStrategies.put(AlgorithmTypes.JACCARD, new JaccardRecommender(graphService));
+            inMemoryStrategies.put(AlgorithmTypes.COMMON_NEIGHBORS, new CommonNeighborsRecommender(graphService));
             inMemoryStrategies.put(AlgorithmTypes.PAGERANK, new PageRankRecommender(repo.getGraph()));
         }
 

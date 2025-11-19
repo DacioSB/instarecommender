@@ -29,7 +29,7 @@ public class PageRankRecommender implements RecommenderStrategy {
 
         List<Recommendation> recommendations = allUsers.stream()
             .filter(u -> !u.equals(user) && !userFollowing.contains(u))
-            .map(u -> new Recommendation(u, pageRank.getScore(u), "pagerank_in_memory"))
+            .map(u -> new Recommendation(u, pageRank.getVertexScore(u), "pagerank_in_memory"))
             .sorted((r1, r2) -> Double.compare(r2.getScore(), r1.getScore()))
             .limit(limit)
             .collect(Collectors.toList());

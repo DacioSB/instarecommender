@@ -4,6 +4,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,12 +51,15 @@ public class InMemoryGraphRepository implements GraphRepository {
 
     @Override
     public List<Map<String, Object>> getGraphData() {
-        return graph.edgeSet().stream().map(edge -> Map.of(
-            "from", graph.getEdgeSource(edge),
-            "to", graph.getEdgeTarget(edge),
-            "weight", graph.getEdgeWeight(edge)
-        )).collect(Collectors.toList());
+        return graph.edgeSet().stream().map(edge -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("from", graph.getEdgeSource(edge));
+            map.put("to", graph.getEdgeTarget(edge));
+            map.put("weight", graph.getEdgeWeight(edge));
+            return map;
+        }).collect(Collectors.toList());
     }
+
 
     @Override
     public void clear() {
