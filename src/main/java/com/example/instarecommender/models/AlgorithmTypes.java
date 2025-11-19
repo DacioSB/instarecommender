@@ -3,5 +3,6 @@ package com.example.instarecommender.models;
 public enum AlgorithmTypes {
     JACCARD,
     COMMON_NEIGHBORS,
-    PAGERANK
+    PAGERANK,
+    ADAMIC_ADAR
 }

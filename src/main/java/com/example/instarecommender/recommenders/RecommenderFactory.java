@@ -6,6 +6,7 @@ import com.example.instarecommender.repositories.InMemoryGraphRepository;
 import com.example.instarecommender.recommenders.neo4j.Neo4jCommonNeighborsRecommender;
 import com.example.instarecommender.recommenders.neo4j.Neo4jJaccardRecommender;
 import com.example.instarecommender.recommenders.neo4j.Neo4jPageRankRecommender;
+
 import org.neo4j.driver.Driver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,13 +14,15 @@ import org.springframework.stereotype.Component;
 import java.util.EnumMap;
 import java.util.Map;
 
+import com.example.instarecommender.services.GraphService;
+
 @Component
 public class RecommenderFactory {
     private final Map<AlgorithmTypes, RecommenderStrategy> inMemoryStrategies;
     private final Map<AlgorithmTypes, RecommenderStrategy> neo4jStrategies;
     private final String storageType;
 
-    public RecommenderFactory(GraphRepository graphRepository, Driver neo4jDriver, @Value("${app.graph.storage-type}") String storageType) {
+    public RecommenderFactory(GraphService graphService, Driver neo4jDriver, @Value("${app.graph.storage-type}") String storageType) {
         this.storageType = storageType;
 
         this.inMemoryStrategies = new EnumMap<>(AlgorithmTypes.class);
