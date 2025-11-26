@@ -12,10 +12,10 @@ import com.example.instarecommender.models.Recommendation;
 import com.example.instarecommender.models.RecommendationResponse;
 import com.example.instarecommender.recommenders.RecommenderStrategy;
 
-public class Neo4jCommonNeighborsRecommender implements RecommenderStrategy {
+public class Neo4jAdamicAdarRecommender implements RecommenderStrategy {
     private final Driver driver;
 
-    public Neo4jCommonNeighborsRecommender(Driver driver) {
+    public Neo4jAdamicAdarRecommender(Driver driver) {
         this.driver = driver;
     }
 
@@ -24,7 +24,10 @@ public class Neo4jCommonNeighborsRecommender implements RecommenderStrategy {
         String query = 
             "MATCH (u:User {id: $userId})-[:FOLLOWS]->(common)-[:FOLLOWS]->(candidate) " +
             "WHERE NOT (u)-[:FOLLOWS]->(candidate) AND u <> candidate " +
-            "RETURN candidate.id AS user, count(common) AS score " +
+            "WITH candidate, common, size((common)-[:FOLLOWS]->()) AS degree " +
+            "WHERE degree > 1 " +
+            "WITH candidate, sum(1.0 / log(degree)) AS score " +
+            "RETURN candidate.id AS user, score " +
             "ORDER BY score DESC, user ASC " +
             "LIMIT $limit";
         
@@ -34,7 +37,7 @@ public class Neo4jCommonNeighborsRecommender implements RecommenderStrategy {
                 .map(r -> new Recommendation(
                     r.get("user").asString(),
                     r.get("score").asDouble(),
-                    "common_neighbors_neo4j"
+                    "adamic_adar_neo4j"
                 ))
                 .collect(Collectors.toList());
             return new RecommendationResponse(recommendations, query);

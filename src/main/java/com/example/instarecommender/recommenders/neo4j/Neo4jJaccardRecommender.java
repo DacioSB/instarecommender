@@ -1,15 +1,16 @@
 package com.example.instarecommender.recommenders.neo4j;
 
-import com.example.instarecommender.models.Recommendation;
-import com.example.instarecommender.models.RecommendationResponse;
-import com.example.instarecommender.recommenders.RecommenderStrategy;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.example.instarecommender.models.Recommendation;
+import com.example.instarecommender.models.RecommendationResponse;
+import com.example.instarecommender.recommenders.RecommenderStrategy;
 
 public class Neo4jJaccardRecommender implements RecommenderStrategy {
     private final Driver driver;
@@ -43,9 +44,9 @@ public class Neo4jJaccardRecommender implements RecommenderStrategy {
         try (Session session = driver.session()) {
             Result result = session.run(query, Map.of("userId", userId, "limit", limit));
             List<Recommendation> recommendations = result.stream()
-                .map(record -> new Recommendation(
-                    record.get("user").asString(),
-                    record.get("score").asDouble(),
+                .map(r -> new Recommendation(
+                    r.get("user").asString(),
+                    r.get("score").asDouble(),
                     "jaccard_neo4j"
                 ))
                 .collect(Collectors.toList());

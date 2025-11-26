@@ -1,13 +1,13 @@
 package com.example.instarecommender.repositories;
 
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.Result;
-import org.neo4j.driver.Session;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Session;
 
 public class Neo4jGraphRepository implements GraphRepository {
 
@@ -82,6 +82,17 @@ public class Neo4jGraphRepository implements GraphRepository {
                 tx.run("MATCH (n) DETACH DELETE n");
                 return null;
             });
+        }
+    }
+
+    @Override
+    public boolean isGraphEmpty() {
+        try (Session session = driver.session()) {
+            Result result = session.run("MATCH (n) RETURN count(n) AS count LIMIT 1");
+            if (result.hasNext()) {
+                return result.next().get("count").asLong() == 0;
+            }
+            return true;
         }
     }
 }

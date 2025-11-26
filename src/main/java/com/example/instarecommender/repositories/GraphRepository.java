@@ -11,4 +11,5 @@ public interface GraphRepository {
     void addUser(String user);
     List<Map<String, Object>> getGraphData();
     void clear();
+    boolean isGraphEmpty();
 }

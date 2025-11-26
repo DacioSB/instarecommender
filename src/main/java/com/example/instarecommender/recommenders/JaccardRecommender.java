@@ -31,7 +31,6 @@ public class JaccardRecommender implements RecommenderStrategy {
 
         for (String candidate : candidates) {
             Set<String> candidateFollowers = graphService.getFollowers(candidate);
-
             Set<String> intersection = new HashSet<>(userFollowing);
             intersection.retainAll(candidateFollowers);
 

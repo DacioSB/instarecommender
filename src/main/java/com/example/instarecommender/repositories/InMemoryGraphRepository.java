@@ -1,14 +1,14 @@
 package com.example.instarecommender.repositories;
 
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleDirectedWeightedGraph;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 public class InMemoryGraphRepository implements GraphRepository {
     private final Graph<String, DefaultWeightedEdge> graph = new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
@@ -66,4 +66,11 @@ public class InMemoryGraphRepository implements GraphRepository {
         Set<String> vertices = Set.copyOf(graph.vertexSet());
         vertices.forEach(graph::removeVertex);
     }
+
+    @Override
+    public boolean isGraphEmpty() {
+        return true;
+    }
+
+    
 }

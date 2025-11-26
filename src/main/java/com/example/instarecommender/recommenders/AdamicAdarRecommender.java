@@ -1,7 +1,6 @@
 package com.example.instarecommender.recommenders;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,30 +14,23 @@ public class AdamicAdarRecommender implements RecommenderStrategy {
     public AdamicAdarRecommender(GraphService graphService) {
         this.graphService = graphService;
     }
+
     @Override
     public RecommendationResponse recommend(String user, int limit) {
         Set<String> userFollowing = graphService.getFollowing(user);
         Map<String, Double> scores = new HashMap<>();
         
         for (String friend : userFollowing) {
-            Set<String> friendFollowing = graphService.getFollowing(friend);
+            Set<String> friendsOfFriend = graphService.getFollowing(friend);
             
-            for (String candidate : friendFollowing) {
+            int degree = friendsOfFriend.size();
+            if (degree <= 1) continue;
+            
+            double weight = 1.0 / Math.log(degree);
+
+            for (String candidate : friendsOfFriend) {
                 if (!candidate.equals(user) && !userFollowing.contains(candidate)) {
-                    Set<String> candidateFollowing = graphService.getFollowing(candidate);
-                    
-                    // Find common neighbors between user and candidate
-                    Set<String> commonNeighbors = new HashSet<>(userFollowing);
-                    commonNeighbors.retainAll(candidateFollowing);
-                    
-                    double aaScore = commonNeighbors.stream()
-                        .mapToDouble(cn -> {
-                            int cnFollowingSize = graphService.getFollowing(cn).size();
-                            return cnFollowingSize > 1 ? 1.0 / Math.log(cnFollowingSize) : 0;
-                        })
-                        .sum();
-                    
-                    scores.merge(candidate, aaScore, Double::sum);
+                    scores.merge(candidate, weight, Double::sum);
                 }
             }
         }
@@ -46,8 +38,7 @@ public class AdamicAdarRecommender implements RecommenderStrategy {
         return new RecommendationResponse(scores.entrySet().stream()
             .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
             .limit(limit)
-            .map(e -> new Recommendation(e.getKey(), e.getValue(), "adamic-adar"))
-            .toList(), "In-memory Adamic-Adar calculation");
+            .map(e -> new Recommendation(e.getKey(), e.getValue(), "adamic-adar-memory"))
+            .toList(), "In-memory Adamic-Adar");
     }
-
 }
