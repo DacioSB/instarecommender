@@ -33,10 +33,11 @@ public class Neo4jJaccardRecommender implements RecommenderStrategy {
         ensureGraphProjection();
         
         String query = "MATCH (u:User {id: $userId}) " +
-                       "CALL gds.nodeSimilarity.stream('social-graph', {sourceNode: u}) " +
+                       "CALL gds.nodeSimilarity.stream('social-graph') " +
                        "YIELD node1, node2, similarity " +
-                       "WITH gds.util.asNode(node1) AS user1, gds.util.asNode(node2) AS user2, similarity " +
-                       "WHERE NOT (user1)-[:FOLLOWS]->(user2) " +
+                       "WHERE node1 = u " +
+                       "WITH u, gds.util.asNode(node2) AS user2, similarity " +
+                       "WHERE NOT (u)-[:FOLLOWS]->(user2) " +
                        "RETURN user2.id AS user, similarity AS score " +
                        "ORDER BY score DESC, user ASC " +
                        "LIMIT $limit";
