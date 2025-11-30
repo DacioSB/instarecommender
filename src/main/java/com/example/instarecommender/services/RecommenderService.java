@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.instarecommender.models.AlgorithmTypes;
 import com.example.instarecommender.models.RecommendationResponse;
-import com.example.instarecommender.recommenders.RecommenderFactory;
-import com.example.instarecommender.recommenders.RecommenderStrategy;
+import com.example.instarecommender.recommenders.factory.RecommenderFactory;
+import com.example.instarecommender.recommenders.factory.RecommenderStrategy;
 
 @Service
 public class RecommenderService {

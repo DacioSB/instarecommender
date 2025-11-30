@@ -1,4 +1,4 @@
-package com.example.instarecommender.recommenders;
+package com.example.instarecommender.recommenders.factory;
 
 import com.example.instarecommender.models.RecommendationResponse;
 

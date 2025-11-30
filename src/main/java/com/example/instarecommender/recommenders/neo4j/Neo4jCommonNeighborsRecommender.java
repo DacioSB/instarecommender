@@ -10,7 +10,7 @@ import org.neo4j.driver.Session;
 
 import com.example.instarecommender.models.Recommendation;
 import com.example.instarecommender.models.RecommendationResponse;
-import com.example.instarecommender.recommenders.RecommenderStrategy;
+import com.example.instarecommender.recommenders.factory.RecommenderStrategy;
 
 public class Neo4jCommonNeighborsRecommender implements RecommenderStrategy {
     private final Driver driver;

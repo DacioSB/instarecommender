@@ -2,6 +2,8 @@ package com.example.instarecommender.recommenders;
 
 import com.example.instarecommender.models.Recommendation;
 import com.example.instarecommender.models.RecommendationResponse;
+import com.example.instarecommender.recommenders.factory.RecommenderStrategy;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.scoring.PageRank;
 import org.jgrapht.graph.DefaultWeightedEdge;

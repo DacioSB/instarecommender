@@ -52,7 +52,15 @@ public class GraphService {
         } else {
             System.out.println("[INFO] Graph data found in storage. Skipping file load.");
         }
+
+        if (graphRepository.supportsGds()) {
+            System.out.println("[INFO] Creating GDS projection...");
+            graphRepository.createGdsProjection();
+        } else {
+            System.out.println("[INFO] Skipping GDS (in-memory mode).");
+        }
     }
+
 
     private void loadGraphFromFile() {
         try(BufferedReader reader = new BufferedReader(new FileReader("graph.csv"))) {

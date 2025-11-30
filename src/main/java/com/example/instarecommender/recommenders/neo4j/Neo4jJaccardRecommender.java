@@ -10,7 +10,7 @@ import org.neo4j.driver.Session;
 
 import com.example.instarecommender.models.Recommendation;
 import com.example.instarecommender.models.RecommendationResponse;
-import com.example.instarecommender.recommenders.RecommenderStrategy;
+import com.example.instarecommender.recommenders.factory.RecommenderStrategy;
 
 public class Neo4jJaccardRecommender implements RecommenderStrategy {
     private final Driver driver;
@@ -32,15 +32,17 @@ public class Neo4jJaccardRecommender implements RecommenderStrategy {
     public RecommendationResponse recommend(String userId, int limit) {
         ensureGraphProjection();
         
-        String query = "MATCH (u:User {id: $userId}) " +
-                       "CALL gds.nodeSimilarity.stream('social-graph') " +
-                       "YIELD node1, node2, similarity " +
-                       "WHERE node1 = u " +
-                       "WITH u, gds.util.asNode(node2) AS user2, similarity " +
-                       "WHERE NOT (u)-[:FOLLOWS]->(user2) " +
-                       "RETURN user2.id AS user, similarity AS score " +
-                       "ORDER BY score DESC, user ASC " +
-                       "LIMIT $limit";
+        String query =
+            "MATCH (u:User {id: $userId}) " +
+            "CALL gds.nodeSimilarity.stream('social-graph') " +
+            "YIELD node1, node2, similarity " +
+            "WHERE node1 = id(u) " +
+            "WITH u, gds.util.asNode(node2) AS user2, similarity " +
+            "WHERE NOT (u)-[:FOLLOWS]->(user2) " +
+            "RETURN user2.id AS user, similarity AS score " +
+            "ORDER BY score DESC, user ASC " +
+            "LIMIT $limit";
+
 
         try (Session session = driver.session()) {
             Result result = session.run(query, Map.of("userId", userId, "limit", limit));

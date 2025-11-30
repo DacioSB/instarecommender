@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.example.instarecommender.models.Recommendation;
 import com.example.instarecommender.models.RecommendationResponse;
+import com.example.instarecommender.recommenders.factory.RecommenderStrategy;
 import com.example.instarecommender.services.GraphService;
 
 public class AdamicAdarRecommender implements RecommenderStrategy {

@@ -95,4 +95,33 @@ public class Neo4jGraphRepository implements GraphRepository {
             return true;
         }
     }
+
+    @Override
+    public boolean supportsGds() {
+        return true;
+    }
+
+    @Override
+    public void createGdsProjection() {
+        try (Session session = driver.session()) {
+            System.out.println("[GDS] Dropping old projection (if exists)...");
+            session.run("CALL gds.graph.drop('social-graph', false)");
+
+            System.out.println("[GDS] Creating projection social-graph...");
+            session.run("""
+                CALL gds.graph.project(
+                    'social-graph',
+                    'User',
+                    {
+                        FOLLOWS: {
+                            type: 'FOLLOWS',
+                            orientation: 'NATURAL'
+                        }
+                    }
+                )
+            """);
+
+            System.out.println("[GDS] Projection ready!");
+        }
+    }
 }

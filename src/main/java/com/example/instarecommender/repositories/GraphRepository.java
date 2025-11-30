@@ -12,4 +12,9 @@ public interface GraphRepository {
     List<Map<String, Object>> getGraphData();
     void clear();
     boolean isGraphEmpty();
+    default boolean supportsGds() {
+        return false;
+    }
+    default void createGdsProjection() {
+    }
 }
