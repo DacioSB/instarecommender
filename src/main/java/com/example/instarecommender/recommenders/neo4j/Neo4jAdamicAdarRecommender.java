@@ -24,7 +24,7 @@ public class Neo4jAdamicAdarRecommender implements RecommenderStrategy {
         String query = 
             "MATCH (u:User {id: $userId})-[:FOLLOWS]->(common)-[:FOLLOWS]->(candidate) " +
             "WHERE NOT (u)-[:FOLLOWS]->(candidate) AND u <> candidate " +
-            "WITH candidate, common, size((common)-[:FOLLOWS]->()) AS degree " +
+            "WITH candidate, common, COUNT { (common)-[:FOLLOWS]->() } AS degree " +
             "WHERE degree > 1 " +
             "WITH candidate, sum(1.0 / log(degree)) AS score " +
             "RETURN candidate.id AS user, score " +

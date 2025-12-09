@@ -30,20 +30,40 @@ public class Neo4jJaccardRecommender implements RecommenderStrategy {
 
     @Override
     public RecommendationResponse recommend(String userId, int limit) {
-        ensureGraphProjection();
-        
         String query =
-            "MATCH (u:User {id: $userId}) " +
-            "CALL gds.nodeSimilarity.stream('social-graph') " +
-            "YIELD node1, node2, similarity " +
-            "WHERE node1 = id(u) " +
-            "WITH u, gds.util.asNode(node2) AS user2, similarity " +
-            "WHERE NOT (u)-[:FOLLOWS]->(user2) " +
-            "RETURN user2.id AS user, similarity AS score " +
+            // Find candidates through friend-of-friend
+            "MATCH (u:User {id: $userId})-[:FOLLOWS]->()-[:FOLLOWS]->(candidate) " +
+            "WHERE NOT (u)-[:FOLLOWS]->(candidate) AND u.id <> candidate.id " +
+            
+            // Intersection: people user follows who ALSO follow the candidate
+            "MATCH (u)-[:FOLLOWS]->(common)-[:FOLLOWS]->(candidate) " +
+            "WITH candidate, collect(DISTINCT common) AS commonUsers " +
+            
+            // Get all users that user follows (for union calculation)
+            "MATCH (u:User {id: $userId})-[:FOLLOWS]->(userFollows) " +
+            "WITH candidate, commonUsers, collect(DISTINCT userFollows) AS allUserFollows " +
+            
+            // Get all users that follow the candidate (for union calculation)
+            "MATCH (candidate)<-[:FOLLOWS]-(follower) " +
+            "WITH candidate, commonUsers, allUserFollows, collect(DISTINCT follower) AS candidateFollowers " +
+            
+            // Calculate Jaccard
+            "WITH candidate, " +
+            "     size(commonUsers) AS intersection, " +
+            "     size(allUserFollows) AS userFollowsCount, " +
+            "     size(candidateFollowers) AS candidateFollowersCount " +
+            
+            "WITH candidate, intersection, " +
+            "     userFollowsCount + candidateFollowersCount - intersection AS unionSize " +
+            
+            "WITH candidate, " +
+            "     CASE WHEN unionSize > 0 THEN toFloat(intersection) / unionSize ELSE 0.0 END AS score " +
+            
+            "WHERE score > 0 " +
+            "RETURN candidate.id AS user, score " +
             "ORDER BY score DESC, user ASC " +
             "LIMIT $limit";
-
-
+            
         try (Session session = driver.session()) {
             Result result = session.run(query, Map.of("userId", userId, "limit", limit));
             List<Recommendation> recommendations = result.stream()
