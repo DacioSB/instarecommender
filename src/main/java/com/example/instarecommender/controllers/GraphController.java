@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.instarecommender.models.AlgorithmTypes;
+import com.example.instarecommender.models.InteractionType;
+import com.example.instarecommender.services.DynamicWeightService;
 import com.example.instarecommender.services.GraphService;
 import com.example.instarecommender.services.RecommenderService;
 
@@ -19,12 +21,34 @@ import com.example.instarecommender.services.RecommenderService;
 @RestController
 @RequestMapping("/api")
 public class GraphController {
+
+    private final DynamicWeightService dynamicWeightService;
     private final GraphService graphService;
     private final RecommenderService recommenderService;
 
-    public GraphController(GraphService graphService, RecommenderService recommenderService) {
+    public GraphController(GraphService graphService, RecommenderService recommenderService, DynamicWeightService dynamicWeightService) {
         this.graphService = graphService;
         this.recommenderService = recommenderService;
+        this.dynamicWeightService = dynamicWeightService;
+    }
+
+    @PostMapping("/interact")
+    public ResponseEntity<String> interact(@RequestBody Map<String, String> payload) {
+        String from = payload.get("from");
+        String to = payload.get("to");
+        String typeStr = payload.get("type");
+
+        if (from == null || to == null || typeStr == null) {
+            return ResponseEntity.badRequest().body("Missing 'from', 'to' or 'type' fields");
+        }
+
+        try {
+            InteractionType type = InteractionType.valueOf(typeStr.toUpperCase());
+            dynamicWeightService.updateWeightBasedOnInteraction(from, to, type);
+            return ResponseEntity.ok("Interaction recorded: " + type + " from " + from + " to " + to);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid interaction type: " + typeStr);
+        }
     }
 
     @GetMapping("/recommend/{user}")

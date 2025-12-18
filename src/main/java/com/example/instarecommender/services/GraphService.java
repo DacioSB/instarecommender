@@ -79,4 +79,18 @@ public class GraphService {
             System.out.println("[WARN] No graph.csv found or error reading file: " + e.getMessage());
         }
     }
+
+    public double getConnectionWeight(String from, String to) {
+        return graphRepository.getConnectionWeight(from, to);
+    }
+
+    public void updateConnectionWeight(String from, String to, double newWeight) {
+        graphRepository.updateConnectionWeight(from, to, newWeight);
+    }
+
+    //getAllConnections
+    public Map<String, Set<String>> getAllConnections() {
+        return graphRepository.getAllConnections();
+    }
+
 }

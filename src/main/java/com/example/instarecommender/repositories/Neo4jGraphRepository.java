@@ -124,4 +124,59 @@ public class Neo4jGraphRepository implements GraphRepository {
             System.out.println("[GDS] Projection ready!");
         }
     }
+
+    @Override
+    public double getConnectionWeight(String from, String to) {
+        try (Session session = driver.session()) {
+            return session.executeRead(tx -> {
+                Result r = tx.run(
+                    "MATCH (a:User {id:$from})-[rel:FOLLOWS]->(b:User {id:$to}) RETURN rel.weight AS weight",
+                    Map.of("from", from, "to", to)
+                );
+                if (r.hasNext()) {
+                    return r.next().get("weight").asDouble(0.0);
+                }
+                return 0.0;
+            });
+        } catch (Exception e) {
+            System.out.println("[WARN] Error getting connection weight: " + e.getMessage());
+            return 0.0;
+        }
+    }
+
+    @Override
+    public void updateConnectionWeight(String from, String to, double newWeight) {
+        try (Session session = driver.session()) {
+            session.executeWrite(tx -> {
+                tx.run("MERGE (a:User {id: $from}) MERGE (b:User {id: $to}) " +
+                       "MERGE (a)-[r:FOLLOWS]->(b) SET r.weight = $weight",
+                       Map.of("from", from, "to", to, "weight", newWeight));
+                return null;
+            });
+            // refresh projection so GDS sees updated weights
+            try {
+                createGdsProjection();
+            } catch (Exception e) {
+                System.out.println("[WARN] Failed to refresh GDS projection after update: " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public Map<String, Set<String>> getAllConnections() {
+        try (Session session = driver.session()) {
+            return session.executeRead(tx -> {
+                Result result = tx.run("MATCH (a:User)-[:FOLLOWS]->(b:User) RETURN a.id AS from, b.id AS to");
+                Map<String, Set<String>> adjacency = new java.util.HashMap<>();
+                result.stream().forEach(r -> {
+                    String from = r.get("from").asString();
+                    String to = r.get("to").asString();
+                    adjacency.computeIfAbsent(from, k -> new java.util.HashSet<>()).add(to);
+                    // ensure nodes with no outgoing edges can be represented if needed:
+                    adjacency.putIfAbsent(to, adjacency.getOrDefault(to, java.util.Set.of()));
+                });
+                return adjacency;
+            });
+        }
+    }
 }

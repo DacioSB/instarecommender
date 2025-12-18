@@ -68,9 +68,31 @@ public class InMemoryGraphRepository implements GraphRepository {
     }
 
     @Override
-    public boolean isGraphEmpty() {
-        return true;
+    public double getConnectionWeight(String from, String to) {
+        if (!graph.containsVertex(from) || !graph.containsVertex(to)) return 0.0;
+        DefaultWeightedEdge e = graph.getEdge(from, to);
+        return e == null ? 0.0 : graph.getEdgeWeight(e);
     }
 
-    
+    @Override
+    public void updateConnectionWeight(String from, String to, double newWeight) {
+        addOrUpdateEdge(from, to, newWeight);
+    }
+
+    @Override
+    public boolean isGraphEmpty() {
+        return graph.vertexSet().isEmpty();
+    }
+
+    @Override
+    public Map<String, Set<String>> getAllConnections() {
+        Map<String, Set<String>> adjacency = new HashMap<>();
+        for (String vertex : graph.vertexSet()) {
+            Set<String> following = graph.outgoingEdgesOf(vertex).stream()
+                .map(graph::getEdgeTarget)
+                .collect(Collectors.toSet());
+            adjacency.put(vertex, following);
+        }
+        return adjacency;
+    }
 }

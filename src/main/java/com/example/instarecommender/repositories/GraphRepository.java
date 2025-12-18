@@ -12,6 +12,9 @@ public interface GraphRepository {
     List<Map<String, Object>> getGraphData();
     void clear();
     boolean isGraphEmpty();
+    double getConnectionWeight(String from, String to);
+    void updateConnectionWeight(String from, String to, double weight);
+    Map<String, Set<String>> getAllConnections();
     default boolean supportsGds() {
         return false;
     }
