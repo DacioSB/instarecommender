@@ -23,7 +23,9 @@ public class Neo4jAdamicAdarRecommender implements RecommenderStrategy {
     public RecommendationResponse recommend(String userId, int limit) {
         String query = 
             "MATCH (u:User {id: $userId})-[:FOLLOWS]->(common)-[:FOLLOWS]->(candidate) " +
-            "WHERE NOT (u)-[:FOLLOWS]->(candidate) AND u <> candidate " +
+            "WHERE u <> candidate " +
+            // Only exclude if there is an explicit 'isFollowing=true' relationship
+            "AND NOT EXISTS { MATCH (u)-[r:FOLLOWS]->(candidate) WHERE r.isFollowing = true } " + 
             "WITH candidate, common, COUNT { (common)-[:FOLLOWS]->() } AS degree " +
             "WHERE degree > 1 " +
             "WITH candidate, sum(1.0 / log(degree)) AS score " +

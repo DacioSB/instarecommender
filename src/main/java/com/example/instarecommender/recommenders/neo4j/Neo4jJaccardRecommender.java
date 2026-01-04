@@ -33,8 +33,8 @@ public class Neo4jJaccardRecommender implements RecommenderStrategy {
         String query =
             // Find candidates through friend-of-friend
             "MATCH (u:User {id: $userId})-[:FOLLOWS]->()-[:FOLLOWS]->(candidate) " +
-            "WHERE NOT (u)-[:FOLLOWS]->(candidate) AND u.id <> candidate.id " +
-            
+            "WHERE u.id <> candidate.id " +
+            "AND NOT EXISTS { MATCH (u)-[r:FOLLOWS]->(candidate) WHERE r.isFollowing = true } " +
             // Intersection: people user follows who ALSO follow the candidate
             "MATCH (u)-[:FOLLOWS]->(common)-[:FOLLOWS]->(candidate) " +
             "WITH candidate, collect(DISTINCT common) AS commonUsers " +

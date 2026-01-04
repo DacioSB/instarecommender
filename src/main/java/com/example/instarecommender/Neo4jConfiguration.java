@@ -12,10 +12,12 @@ public class Neo4jConfiguration {
     
     @Value("${spring.neo4j.authentication.password}")
     private String password;
+    @Value("${spring.neo4j.uri}")
+    private String uri;
     @Bean
     public Driver neo4jDriver() {
         return GraphDatabase.driver(
-            "bolt://localhost:7687",
+            uri,
             AuthTokens.basic("neo4j", password)
         );
 

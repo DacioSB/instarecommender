@@ -21,9 +21,12 @@ public class Neo4jGraphRepository implements GraphRepository {
     public void addOrUpdateEdge(String from, String to, double weight) {
         try (Session session = driver.session()) {
             session.executeWrite(tx -> {
-                tx.run("MERGE (a:User {id: $from}) MERGE (b:User {id: $to}) " +
-                       "MERGE (a)-[r:FOLLOWS]->(b) SET r.weight = $weight",
-                       Map.of("from", from, "to", to, "weight", weight));
+                tx.run("MERGE (a:User {id: $from}) " +
+                    "MERGE (b:User {id: $to}) " +
+                    "MERGE (a)-[r:FOLLOWS]->(b) " +
+                    // KEY CHANGE: Explicitly set isFollowing to true
+                    "SET r.weight = $weight, r.isFollowing = true", 
+                    Map.of("from", from, "to", to, "weight", weight));
                 return null;
             });
         }
@@ -148,9 +151,14 @@ public class Neo4jGraphRepository implements GraphRepository {
     public void updateConnectionWeight(String from, String to, double newWeight) {
         try (Session session = driver.session()) {
             session.executeWrite(tx -> {
-                tx.run("MERGE (a:User {id: $from}) MERGE (b:User {id: $to}) " +
-                       "MERGE (a)-[r:FOLLOWS]->(b) SET r.weight = $weight",
-                       Map.of("from", from, "to", to, "weight", newWeight));
+                String query = 
+                    "MERGE (a:User {id: $from}) " +
+                    "MERGE (b:User {id: $to}) " +
+                    "MERGE (a)-[r:FOLLOWS]->(b) " +
+                    "ON CREATE SET r.weight = $weight, r.isFollowing = false " +
+                    "ON MATCH SET r.weight = $weight"; // If it existed, keep isFollowing as is
+                    
+                tx.run(query, Map.of("from", from, "to", to, "weight", newWeight));
                 return null;
             });
             // refresh projection so GDS sees updated weights

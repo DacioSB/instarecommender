@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.instarecommender.models.AlgorithmTypes;
+import com.example.instarecommender.models.InteractionDTO;
 import com.example.instarecommender.models.InteractionType;
 import com.example.instarecommender.services.DynamicWeightService;
 import com.example.instarecommender.services.GraphService;
@@ -33,10 +34,10 @@ public class GraphController {
     }
 
     @PostMapping("/interact")
-    public ResponseEntity<String> interact(@RequestBody Map<String, String> payload) {
-        String from = payload.get("from");
-        String to = payload.get("to");
-        String typeStr = payload.get("type");
+    public ResponseEntity<String> interact(@RequestBody InteractionDTO payload) {
+        String from = payload.getFrom();
+        String to = payload.getTo();
+        String typeStr = payload.getType().toString();
 
         if (from == null || to == null || typeStr == null) {
             return ResponseEntity.badRequest().body("Missing 'from', 'to' or 'type' fields");

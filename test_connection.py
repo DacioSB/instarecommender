@@ -1,6 +1,6 @@
 from neo4j import GraphDatabase
 
-uri = "bolt://localhost:7687"
+uri = "bolt://3.215.181.153:7687"
 username = "neo4j"
 password = "local-dev-password" # Replace with your actual password
 

@@ -40,8 +40,12 @@ public class Neo4jPageRankRecommender implements RecommenderStrategy {
             "}) " +
             "YIELD nodeId, score " +
             "WITH gds.util.asNode(nodeId) AS candidate, score " +
-            "WHERE NOT ((:User {id: $userId})-[:FOLLOWS]->(candidate)) " +
-            "AND candidate.id <> $userId " +
+            "WHERE candidate.id <> $userId " +
+            // Only exclude if there is an explicit 'isFollowing=true' relationship
+            "AND NOT EXISTS { " +
+            "   MATCH (:User {id: $userId})-[r:FOLLOWS]->(candidate) " +
+            "   WHERE r.isFollowing = true " +
+            "} " +
             "RETURN candidate.id AS user, score " +
             "ORDER BY score DESC " +
             "LIMIT $limit";
