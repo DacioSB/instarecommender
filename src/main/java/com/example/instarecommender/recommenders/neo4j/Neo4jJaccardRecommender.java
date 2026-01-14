@@ -31,33 +31,29 @@ public class Neo4jJaccardRecommender implements RecommenderStrategy {
     @Override
     public RecommendationResponse recommend(String userId, int limit) {
         String query =
-            // Find candidates through friend-of-friend
-            "MATCH (u:User {id: $userId})-[:FOLLOWS]->()-[:FOLLOWS]->(candidate) " +
+            // Encontrar candidatos
+            "MATCH (u:User {id: $userId})-[r1:FOLLOWS]->()-[r2:FOLLOWS]->(candidate) " +
             "WHERE u.id <> candidate.id " +
-            "AND NOT EXISTS { MATCH (u)-[r:FOLLOWS]->(candidate) WHERE r.isFollowing = true } " +
-            // Intersection: people user follows who ALSO follow the candidate
-            "MATCH (u)-[:FOLLOWS]->(common)-[:FOLLOWS]->(candidate) " +
-            "WITH candidate, collect(DISTINCT common) AS commonUsers " +
             
-            // Get all users that user follows (for union calculation)
-            "MATCH (u:User {id: $userId})-[:FOLLOWS]->(userFollows) " +
-            "WITH candidate, commonUsers, collect(DISTINCT userFollows) AS allUserFollows " +
-            
-            // Get all users that follow the candidate (for union calculation)
-            "MATCH (candidate)<-[:FOLLOWS]-(follower) " +
-            "WITH candidate, commonUsers, allUserFollows, collect(DISTINCT follower) AS candidateFollowers " +
-            
-            // Calculate Jaccard
+            // Calcular interseção PONDERADA pelos pesos
+            "MATCH (u)-[r3:FOLLOWS]->(common)-[r4:FOLLOWS]->(candidate) " +
             "WITH candidate, " +
-            "     size(commonUsers) AS intersection, " +
-            "     size(allUserFollows) AS userFollowsCount, " +
-            "     size(candidateFollowers) AS candidateFollowersCount " +
+            "     sum(r3.weight * r4.weight) AS weightedIntersection, " +  // ← PESO!
+            "     collect(DISTINCT common) AS commonUsers " +
             
-            "WITH candidate, intersection, " +
-            "     userFollowsCount + candidateFollowersCount - intersection AS unionSize " +
+            // Somar todos os pesos do usuário
+            "MATCH (u:User {id: $userId})-[r5:FOLLOWS]->(userFollows) " +
+            "WITH candidate, weightedIntersection, commonUsers, " +
+            "     sum(r5.weight) AS userTotalWeight " +
             
+            // Somar todos os pesos dos seguidores do candidato
+            "MATCH (candidate)<-[r6:FOLLOWS]-(follower) " +
+            "WITH candidate, weightedIntersection, userTotalWeight, " +
+            "     sum(r6.weight) AS candidateTotalWeight " +
+            
+            // Calcular Jaccard ponderado
             "WITH candidate, " +
-            "     CASE WHEN unionSize > 0 THEN toFloat(intersection) / unionSize ELSE 0.0 END AS score " +
+            "     weightedIntersection / (userTotalWeight + candidateTotalWeight - weightedIntersection) AS score " +
             
             "WHERE score > 0 " +
             "RETURN candidate.id AS user, score " +
