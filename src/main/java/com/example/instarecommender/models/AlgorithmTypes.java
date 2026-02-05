@@ -4,5 +4,6 @@ public enum AlgorithmTypes {
     JACCARD,
     COMMON_NEIGHBORS,
     PAGERANK,
-    ADAMIC_ADAR
+    ADAMIC_ADAR,
+    GNN_EMBEDDING,
 }
