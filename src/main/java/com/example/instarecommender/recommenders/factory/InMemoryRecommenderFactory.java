@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.example.instarecommender.models.AlgorithmTypes;
 import com.example.instarecommender.recommenders.AdamicAdarRecommender;
 import com.example.instarecommender.recommenders.CommonNeighborsRecommender;
+import com.example.instarecommender.recommenders.GNNRecommender;
 import com.example.instarecommender.recommenders.JaccardRecommender;
 import com.example.instarecommender.recommenders.PageRankRecommender;
 import com.example.instarecommender.repositories.GraphRepository;
@@ -30,6 +31,7 @@ public class InMemoryRecommenderFactory implements RecommenderFactory {
         strategies.put(AlgorithmTypes.COMMON_NEIGHBORS, new CommonNeighborsRecommender(graphService));
         strategies.put(AlgorithmTypes.PAGERANK, new PageRankRecommender(mem.getGraph()));
         strategies.put(AlgorithmTypes.ADAMIC_ADAR, new AdamicAdarRecommender(graphService));
+        strategies.put(AlgorithmTypes.GNN_EMBEDDING, new GNNRecommender(graphService));
     }
 
     @Override
