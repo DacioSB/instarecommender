@@ -105,7 +105,8 @@ public class GNNRecommender implements RecommenderStrategy{
         // C. Calculate Scores via Matrix Multiplication
         // [NumNodes, Features] x [Features, 1] = [NumNodes, 1]
         // The result is a column vector where row 'i' is the similarity score for user 'i'
-        INDArray similarities = embeddings.mmul(targetVector.transpose());
+        INDArray targetColumn = targetVector.reshape(EMBEDDING_SIZE, 1);
+        INDArray similarities = embeddings.mmul(targetColumn);
 
         List<Recommendation> recs = new ArrayList<>();
         Set<String> alreadyFollowing = graphService.getFollowing(targetUser);
